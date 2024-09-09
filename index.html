@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple WebSocket Game</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <p>Use arrow keys to move your square. Multiple players can connect!</p>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const ws = new WebSocket('ws://localhost:8080');
+
+        // Initialize player's position
+        let player = { x: 250, y: 250, color: 'blue' };
+
+        // Store all players, including yourself and others
+        let allPlayers = {};
+
+        // Draw all players on the canvas
+        function drawPlayers(players) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);  // Clear the canvas
+            for (const id in players) {
+                const p = players[id];
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, 20, 20);  // Draw each player as a small square
+            }
+        }
+
+        ws.onopen = () => {
+            console.log('Connected to server');
+            ws.send(JSON.stringify(player));  // Send initial position to the server
+        };
+
+        ws.onmessage = (event) => {
+            const playersData = JSON.parse(event.data);
+            console.log('Players data from server:', playersData);
+            allPlayers = playersData;
+            drawPlayers(allPlayers);  // Draw all players received from the server
+        };
+
+        // Move your player when arrow keys are pressed
+        document.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case 'ArrowUp': player.y -= 5; break;
+                case 'ArrowDown': player.y += 5; break;
+                case 'ArrowLeft': player.x -= 5; break;
+                case 'ArrowRight': player.x += 5; break;
+            }
+            ws.send(JSON.stringify(player));  // Send updated position to the server
+        });
+    </script>
+</body>
+
+</html>
