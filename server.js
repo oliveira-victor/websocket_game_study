@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 8080 });
+const ws = new WebSocket('https://websocket-game-study.onrender.com');
 
 // Store players with their positions, keyed by their WebSocket connection
 let players = {};
