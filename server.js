@@ -1,5 +1,8 @@
 const WebSocket = require('ws');
-const wss = new WebSocket.Server('https://websocket-game-study.onrender.com');
+
+// Use the PORT environment variable, or fallback to port 8080
+const port = process.env.PORT || 8080;
+const wss = new WebSocket.Server({ port });  // Initialize WebSocket server with the correct port
 
 let players = {};
 
